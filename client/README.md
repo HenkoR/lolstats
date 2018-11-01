@@ -42,3 +42,42 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+
+
+
+
+
+
+
+
+## Notes
+
+- Summoners by Name
+    - Get AccountId
+- Matches by Account Id
+    - Get match list
+- Matches By Id
+    - participantId = result.participantIdentities[].Where(x => x.player.accountId=accId)
+    - participants[].Where(x => x.participantId=parId)
+        - Gives teamid for Result (stats.win === "Win")
+        - And All participant data
+
+
+
+outcome (victory or defeat) = stats.win === "Win"
+game length (duration) = gameDuration
+summoner name = Summoners by Name
+summoner spells = participants[].spell1Id && spell2Id
+summoner runes = perks
+champion name = championId - Get champion
+KDA = Kills,deaths,assists
+items bought during the match (names should be fine don't need any icons) = 
+champion level in the match = champLevel
+total creep score = 
+creep score per minute (total creeps divided by game length)
+
+
+
+## Lessons Learned
