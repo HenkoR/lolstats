@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './app.css';
+import MatchStats from './matchStats';
 
 class App extends Component {
     state = {
@@ -27,7 +28,7 @@ class App extends Component {
         }
         
         const body = await response.json();        
-        this.setState({ summoner: JSON.parse(body.summoner) });
+        this.setState({ summoner: JSON.parse(body.summonerStats) });
     };
 
     render() {
@@ -48,7 +49,7 @@ class App extends Component {
                     <button type="submit">Submit</button>
                 </form>
                 <div className="SummonerStats">
-                    <p>{this.state.summoner.name}</p>
+                    <MatchStats summoner={this.state.summoner} />
                 </div>
             </div>
         );
