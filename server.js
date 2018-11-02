@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
 const https = require('https');
+require('dotenv').config();
+
 
 const port = process.env.PORT || 5000;
 const riotAPI = "na1.api.riotgames.com";
@@ -13,7 +15,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // API calls
 app.get('/api/summoner', (req, res) => {
-  
   var options = {
     host: riotAPI,
     port: 443,

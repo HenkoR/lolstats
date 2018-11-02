@@ -34,19 +34,11 @@ class App extends Component {
         return (
             <div className="app">
                 <header className="app-header">
-                    <p>Edit <code>src/app.js</code> and save to reload.</p>
-                    <a
-                        className="app-link"
-                        href="https://reactjs.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Learn React
-                    </a>
+                    <p>League Of Legends Summoner Stats</p>
                 </header>
                 <form onSubmit={this.getSummonerInfo}>
                     <p>
-                        <strong>Post to Server:</strong>
+                        <strong>Enter the summoners name:</strong>
                     </p>
                     <input
                         type="text"
@@ -55,7 +47,9 @@ class App extends Component {
                     />
                     <button type="submit">Submit</button>
                 </form>
-                <p>{this.state.summoner.name}</p>
+                <div className="SummonerStats">
+                    <p>{this.state.summoner.name}</p>
+                </div>
             </div>
         );
     }
