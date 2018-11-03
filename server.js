@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
 const axios = require("axios");
-const fs = require('fs');
 
 require('dotenv').config();
 
@@ -16,7 +15,29 @@ const riotAPI = axios.create({
   headers: { 'X-Riot-Token': riotToken }
 });
 
-const spellsFile = JSON.parse(fs.readFileSync('../static_data/summoner.json', 'utf8'));
+
+const { Kayn, REGIONS, BasicJSCache } = require('kayn')
+const kayn = Kayn(riotToken)({
+  region: REGIONS.NORTH_AMERICA,
+  locale: 'en_US',
+  debugOptions: {
+    isEnabled: true,
+    showKey: false,
+  },
+  requestOptions: {
+    shouldRetry: true,
+    numberOfRetriesBeforeAbort: 3,
+    delayBeforeRetry: 1000,
+    burst: false,
+    shouldExitOn403: false,
+  },
+  cacheOptions: {
+    cache: new BasicJSCache({ max: 5000 }),
+    timeToLives: {
+      useDefault: true, // Cache DDragon by default!
+    },
+  }
+})
 
 
 app.use(bodyParser.json());
@@ -67,22 +88,39 @@ function getSpells(obj, name) {
   }
 }
 
+function cleanStaticData(data) {
+  var res =  Object.keys(data).map(key => {
+    return data[key];
+  });
 
+  return res;
+}
+
+
+let spellsList = [];
+
+kayn.DDragon.SummonerSpell.list()
+  .callback(function (error, spells) {
+    spellsList = cleanStaticData(spells.data);
+
+  });
 
 // API calls
 app.get('/api/summoner', async (req, res) => {
   try {
-    let sum = await getSummoner(req.query.name);
 
-    let matchList = await getMatches(sum.accountId);
+    let sum = await kayn.Summoner.by.name(req.query.name)
+
+    let matchList = await kayn.Matchlist.by.accountID(sum.accountId)
 
     let summonerStats = {
-      summoner: sum,
+      summoner: sum.name,
       matches: []
     }
 
     for (var i = 0; i < 3; i++) {
-      let matchResult = await getMatchesResults(matchList.matches[i].gameId);
+
+      let matchResult = await kayn.Match.get(matchList.matches[i].gameId);
 
       let matchStat = {
         win: null,
@@ -108,81 +146,83 @@ app.get('/api/summoner', async (req, res) => {
         return element.participantId == participantId;
       });
 
+      var spell1 = spellsList.find(function (element) {
+        return element.key == participant.spell1Id;
+      });
 
+      var spell2 = spellsList.find(function (element) {
+        return element.key == participant.spell2Id;
+      });
 
-      getSpells(spellsFile, "key");
-      console.log("result: " + result.join(", "));
-
-
-      matchStat.win = participant.stats.win;
-      matchStat.duration = matchResult.gameDuration;
-      matchStat.champion = participant.championId;
-      matchStat.champlvl = participant.champLevel;
-      matchStat.kills = participant.kills;
-      matchStat.deaths = participant.deaths;
-      matchStat.assists = participant.assists;
-      matchStat.cs = participant.totalMinionsKilled + participant.neutralMinionsKilled;
-      matchStat.cspm = matchStat.cs / (matchResult.gameDuration / 60)
-      matchStat.spells = [
-        { spellId: participant.spell1Id, spellName: '' },
-        { spellId: participant.spell2Id, spellName: '' },
-      ];
-      matchStat.runes = [
-        {
-          runeId: participant.perk0,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk1,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk2,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk3,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk4,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk5,
-          runeName: ''
-        }
-      ];
-      matchStat.items = [
-        {
-          itemId: participant.item0,
-          itemName: ''
-        },
-        {
-          itemId: participant.item1,
-          itemName: ''
-        },
-        {
-          itemId: participant.item2,
-          itemName: ''
-        },
-        {
-          itemId: participant.item3,
-          itemName: ''
-        },
-        {
-          itemId: participant.item4,
-          itemName: ''
-        },
-        {
-          itemId: participant.item5,
-          itemName: ''
-        },
-        {
-          itemId: participant.item6,
-          itemName: ''
-        }
-      ];
+        matchStat.win = participant.stats.win;
+        matchStat.duration = matchResult.gameDuration;
+        matchStat.champion = participant.championId;
+        matchStat.champlvl = participant.champLevel;
+        matchStat.kills = participant.kills;
+        matchStat.deaths = participant.deaths;
+        matchStat.assists = participant.assists;
+        matchStat.cs = participant.totalMinionsKilled + participant.neutralMinionsKilled;
+        matchStat.cspm = matchStat.cs / (matchResult.gameDuration / 60)
+        matchStat.spells = [
+          { spellId: participant.spell1Id, spellName: spell1.id },
+          { spellId: participant.spell2Id, spellName: spell2.id },
+        ];
+        matchStat.runes = [
+          {
+            runeId: participant.perk0,
+            runeName: ''
+          },
+          {
+            runeId: participant.perk1,
+            runeName: ''
+          },
+          {
+            runeId: participant.perk2,
+            runeName: ''
+          },
+          {
+            runeId: participant.perk3,
+            runeName: ''
+          },
+          {
+            runeId: participant.perk4,
+            runeName: ''
+          },
+          {
+            runeId: participant.perk5,
+            runeName: ''
+          }
+        ];
+        matchStat.items = [
+          {
+            itemId: participant.item0,
+            itemName: ''
+          },
+          {
+            itemId: participant.item1,
+            itemName: ''
+          },
+          {
+            itemId: participant.item2,
+            itemName: ''
+          },
+          {
+            itemId: participant.item3,
+            itemName: ''
+          },
+          {
+            itemId: participant.item4,
+            itemName: ''
+          },
+          {
+            itemId: participant.item5,
+            itemName: ''
+          },
+          {
+            itemId: participant.item6,
+            itemName: ''
+          }
+        ];
 
       summonerStats.matches.push(matchStat);
 
