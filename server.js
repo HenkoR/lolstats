@@ -7,7 +7,6 @@ require('dotenv').config();
 
 const port = process.env.PORT || 5000;
 const riotToken = process.env.riotToken;
-
 const { Kayn, REGIONS, BasicJSCache } = require('kayn')
 const kayn = Kayn(riotToken)({
   region: REGIONS.NORTH_AMERICA,
@@ -36,6 +35,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 function cleanStaticData(data) {
   var res = Object.keys(data).map(key => {
+    let newItem = data[key];
+    newItem.pk = key;
     return data[key];
   });
 
@@ -54,7 +55,12 @@ kayn.DDragon.Champion.listDataByIdWithParentAsId()
   .callback(function (error, champions) {
     championList = cleanStaticData(champions.data);
   });
-  
+
+let itemsList = [];
+kayn.DDragon.Item.list()
+  .callback(function (error, items) {
+    itemsList = cleanStaticData(items.data);
+  });
 
 // API calls
 app.get('/api/summoner', async (req, res) => {
@@ -69,7 +75,7 @@ app.get('/api/summoner', async (req, res) => {
       matches: []
     }
 
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 5; i++) {
 
       let matchResult = await kayn.Match.get(matchList.matches[i].gameId);
 
@@ -81,11 +87,13 @@ app.get('/api/summoner', async (req, res) => {
         spells: null,
         runes: null,
         champion: null,
+        championUrl: null,
+        champName: null,
+        champlvl: null,
         kills: null,
         deaths: null,
         assists: null,
-        items: null,
-        champlvl: null,
+        items: [],
         cs: null,
         cspm: null
       }
@@ -110,21 +118,95 @@ app.get('/api/summoner', async (req, res) => {
         return element.id == participant.championId;
       });
 
-      console.log(champion);
+      let item0 = itemsList.find(function (element) {
+        return element.pk == participant.stats.item0;
+      });
+      if (typeof item0 !== 'undefined' && item0) {
+        matchStat.items.push({
+          itemId: item0.pk,
+          itemName: item0.name,
+          itemImg: item0.image.full
+        })
+      }
+
+      let item1 = itemsList.find(function (element) {
+        return element.pk == participant.stats.item1;
+      });
+      if (typeof item1 !== 'undefined' && item1) {
+        matchStat.items.push({
+          itemId: item1.pk,
+          itemName: item1.name,
+          itemImg: item1.image.full
+        })
+      }
+      let item2 = itemsList.find(function (element) {
+        return element.pk == participant.stats.item2;
+      });
+      if (typeof item2 !== 'undefined' && item2) {
+        matchStat.items.push({
+          itemId: item2.pk,
+          itemName: item2.name,
+          itemImg: item2.image.full
+        })
+      }
+      let item3 = itemsList.find(function (element) {
+        return element.pk == participant.stats.item3;
+      });
+      if (typeof item3 !== 'undefined' && item3) {
+        matchStat.items.push({
+          itemId: item3.pk,
+          itemName: item3.name,
+          itemImg: item3.image.full
+        })
+      }
+      let item4 = itemsList.find(function (element) {
+        return element.pk == participant.stats.item4;
+      });
+      if (typeof item4 !== 'undefined' && item4) {
+        matchStat.items.push({
+          itemId: item4.pk,
+          itemName: item4.name,
+          itemImg: item4.image.full
+        })
+      }
+      let item5 = itemsList.find(function (element) {
+        return element.pk == participant.stats.item5;
+      });
+      if (typeof item5 !== 'undefined' && item5) {
+        matchStat.items.push({
+          itemId: item5.pk,
+          itemName: item5.name,
+          itemImg: item5.image.full
+        })
+      }
+      let item6 = itemsList.find(function (element) {
+        return element.pk == participant.stats.item6;
+      });
+      if (typeof item6 !== 'undefined' && item6) {
+        matchStat.items.push({
+          itemId: item6.pk,
+          itemName: item6.name,
+          itemImg: item6.image.full
+        })
+      }
+
+      
       matchStat.gameId = matchResult.gameId;
       matchStat.win = participant.stats.win;
       matchStat.duration = matchResult.gameDuration;
       matchStat.champion = participant.championId;
-      matchStat.championUrl = participant.championId;
-      matchStat.champlvl = participant.champLevel;
-      matchStat.kills = participant.kills;
-      matchStat.deaths = participant.deaths;
-      matchStat.assists = participant.assists;
-      matchStat.cs = participant.totalMinionsKilled + participant.neutralMinionsKilled;
-      matchStat.cspm = matchStat.cs / (matchResult.gameDuration / 60)
+      matchStat.championUrl = champion.image.full;
+      matchStat.champName = champion.name;
+      matchStat.champlvl = participant.stats.champLevel;
+      matchStat.kills = participant.stats.kills;
+      matchStat.deaths = participant.stats.deaths;
+      matchStat.assists = participant.stats.assists;
+      matchStat.kda = Number.parseFloat((participant.stats.kills + participant.stats.assists) / participant.stats.deaths).toPrecision(2);
+      matchStat.cs = participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled;
+      matchStat.cspm = Number.parseFloat(matchStat.cs / (matchResult.gameDuration / 60)).toPrecision(2);
       matchStat.spells = [
-        { spellId: participant.spell1Id, spellName: spell1.id },
-        { spellId: participant.spell2Id, spellName: spell2.id },
+        { spellId: participant.spell1Id, spellName: spell1.id, spellImg: spell1.image.full },
+        { spellId: participant.spell2Id, spellName: spell2.id, spellImg: spell2.image.full },
       ];
       matchStat.runes = [
         {
@@ -150,36 +232,6 @@ app.get('/api/summoner', async (req, res) => {
         {
           runeId: participant.perk5,
           runeName: ''
-        }
-      ];
-      matchStat.items = [
-        {
-          itemId: participant.item0,
-          itemName: ''
-        },
-        {
-          itemId: participant.item1,
-          itemName: ''
-        },
-        {
-          itemId: participant.item2,
-          itemName: ''
-        },
-        {
-          itemId: participant.item3,
-          itemName: ''
-        },
-        {
-          itemId: participant.item4,
-          itemName: ''
-        },
-        {
-          itemId: participant.item5,
-          itemName: ''
-        },
-        {
-          itemId: participant.item6,
-          itemName: ''
         }
       ];
 

@@ -11,7 +11,7 @@
 }
 
 .divTableCell, .divTableHead {
-	display: table-cell;
+    display: table-cell;
 }
 
 .Stats {
@@ -43,4 +43,14 @@
 .Defeat {
     font-weight: 600;
     color: #EB2A44;
+}
+
+.champImg {
+    width: 40px;
+    padding: 2px;
+}
+
+.spellImg {
+    width: 20px;
+    padding: 2px;
 }

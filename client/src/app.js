@@ -4,7 +4,7 @@ import MatchStats from './matchStats';
 
 class App extends Component {
     state = {
-        summonerName: 'BFY Meowington',
+        summonerName: '',
         summonerStats: {
             summoner: '',
             matches: []
