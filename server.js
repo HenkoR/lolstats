@@ -62,7 +62,6 @@ kayn.DDragon.Item.list()
     itemsList = cleanStaticData(items.data);
   });
 
-// API calls
 app.get('/api/summoner', async (req, res) => {
   try {
 
@@ -208,33 +207,6 @@ app.get('/api/summoner', async (req, res) => {
         { spellId: participant.spell1Id, spellName: spell1.id, spellImg: spell1.image.full },
         { spellId: participant.spell2Id, spellName: spell2.id, spellImg: spell2.image.full },
       ];
-      matchStat.runes = [
-        {
-          runeId: participant.perk0,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk1,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk2,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk3,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk4,
-          runeName: ''
-        },
-        {
-          runeId: participant.perk5,
-          runeName: ''
-        }
-      ];
-
       summonerStats.matches.push(matchStat);
 
     }
