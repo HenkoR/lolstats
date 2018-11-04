@@ -1,0 +1,27 @@
+
+
+.Item {
+    text-align: left;    
+    font-size: 12px;
+	display: table;
+	width: 100%;
+}
+
+.items-list {
+    padding: 0px;
+    padding-right: 20px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+li { float: right;}
+
+.itemImg {
+    width: 20px;
+    padding: 2px;
+}
