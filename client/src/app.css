@@ -32,3 +32,9 @@
         transform: rotate(360deg);
     }
 }
+
+.SummonerStats {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}

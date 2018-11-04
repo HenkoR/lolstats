@@ -1,5 +1,46 @@
+.match-list {
+    padding: 0;
+}
+
+.divTableBody {
+    display: table-row-group;
+}
+
+.divTableRow {
+	display: table-row;
+}
+
+.divTableCell, .divTableHead {
+	display: table-cell;
+}
 
 .Stats {
+    text-align: left;
+    padding: 5px; 
+    margin: 10px;
+    font-size: 12px;
+	display: table;
+	width: 100%;
+}
+
+.Stats-Victory {
     background-color: #A3CFEC;
-    margin: 10px; 
+}
+
+.Stats-Defeat {
+    background-color: #E2B6B2;
+}
+
+.Match {
+    font-size: 12px;
+}
+
+.Victory {
+    font-weight: 600;
+    color: #1F8ECC;
+}
+
+.Defeat {
+    font-weight: 600;
+    color: #EB2A44;
 }
